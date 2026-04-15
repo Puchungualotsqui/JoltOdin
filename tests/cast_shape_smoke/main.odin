@@ -1,5 +1,6 @@
 package main
 
+import "base:runtime"
 import "core:fmt"
 import "core:os"
 
@@ -216,7 +217,11 @@ main :: proc() {
 		os.exit(1)
 	}
 
-	state := Cast_State{}
+	state := Cast_State {
+		hit_count     = 0,
+		best_fraction = 1e30,
+		last_body     = joltc.BodyID(0),
+	}
 	collector_fns := joltc.Cast_Shape_Collector_Fns {
 		Reset  = cast_reset,
 		AddHit = cast_add_hit,
@@ -227,7 +232,7 @@ main :: proc() {
 	args.ShapeCast.Shape = cast_shape
 	args.ShapeCast.Scale = vec3(1, 1, 1)
 	args.ShapeCast.CenterOfMassStart = rmat44_identity_at(rvec3(0, 5, 0))
-args.ShapeCast.Direction = vec3(0, -10, 0)
+	args.ShapeCast.Direction = vec3(0, -10, 0)
 	joltc.JPC_ShapeCastSettings_default(&args.Settings)
 	args.BaseOffset = rvec3(0, 0, 0)
 	args.Collector = collector

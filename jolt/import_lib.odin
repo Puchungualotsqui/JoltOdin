@@ -82,3 +82,13 @@ when JPC_DOUBLE_PRECISION {
 	#assert(size_of(Narrow_Phase_Query_Cast_Shape_Args) == 224)
 	#assert(align_of(Narrow_Phase_Query_Cast_Shape_Args) == 16)
 }
+
+#assert(size_of(Cast_Shape_Collector_Fns) == 2 * size_of(rawptr))
+#assert(offset_of(Cast_Shape_Collector_Fns, Reset) == 0)
+#assert(offset_of(Cast_Shape_Collector_Fns, AddHit) == size_of(rawptr))
+
+#assert(size_of(Collide_Shape_Collector_Fns) == 2 * size_of(rawptr))
+#assert(offset_of(Collide_Shape_Collector_Fns, Reset) == 0)
+#assert(offset_of(Collide_Shape_Collector_Fns, AddHit) == size_of(rawptr))
+
+#assert(size_of(rawptr) == 8)

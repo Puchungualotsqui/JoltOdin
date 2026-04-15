@@ -104,16 +104,18 @@ build_and_test() {
           ;;
   esac
 
-  run_odin_test "tests/physics_smoke"          "odin_physics_smoke"          "${EXTRA_LINKS}"
-  run_odin_test "tests/raycast_smoke"          "odin_raycast_smoke"          "${EXTRA_LINKS}"
-  run_odin_test "tests/contact_listener_smoke" "odin_contact_listener_smoke" "${EXTRA_LINKS}"
-  run_odin_test "tests/constraint_smoke"       "odin_constraint_smoke"       "${EXTRA_LINKS}"
-  run_odin_test "tests/cast_shape_smoke"      "odin_cast_shape_smoke"      "${EXTRA_LINKS}"
-  run_odin_test "tests/collide_shape_smoke"   "odin_collide_shape_smoke"   "${EXTRA_LINKS}"
-  run_odin_test "tests/body_lock_smoke"       "odin_body_lock_smoke"       "${EXTRA_LINKS}"
-  run_odin_test "tests/hinge_constraint_smoke"     "odin_hinge_constraint_smoke"     "${EXTRA_LINKS}"
-  run_odin_test "tests/slider_constraint_smoke"    "odin_slider_constraint_smoke"    "${EXTRA_LINKS}"
-  run_odin_test "tests/body_interface_ops_smoke"   "odin_body_interface_ops_smoke"   "${EXTRA_LINKS}"
+  run_odin_test "tests/physics_smoke"             "odin_physics_smoke"             "${EXTRA_LINKS}"
+  run_odin_test "tests/raycast_smoke"             "odin_raycast_smoke"             "${EXTRA_LINKS}"
+  run_odin_test "tests/contact_listener_smoke"    "odin_contact_listener_smoke"    "${EXTRA_LINKS}"
+  run_odin_test "tests/constraint_smoke"          "odin_constraint_smoke"          "${EXTRA_LINKS}"
+  run_odin_test "tests/cast_shape_smoke"          "odin_cast_shape_smoke"          "${EXTRA_LINKS}"
+  run_odin_test "tests/collide_shape_smoke"       "odin_collide_shape_smoke"       "${EXTRA_LINKS}"
+  run_odin_test "tests/body_lock_smoke"           "odin_body_lock_smoke"           "${EXTRA_LINKS}"
+  run_odin_test "tests/hinge_constraint_smoke"    "odin_hinge_constraint_smoke"    "${EXTRA_LINKS}"
+  run_odin_test "tests/slider_constraint_smoke"   "odin_slider_constraint_smoke"   "${EXTRA_LINKS}"
+  run_odin_test "tests/body_interface_ops_smoke"  "odin_body_interface_ops_smoke"  "${EXTRA_LINKS}"
+  run_odin_test "tests/compound_shape_smoke"      "odin_compound_shape_smoke"      "${EXTRA_LINKS}"
+  run_odin_test "tests/sixdof_constraint_smoke"   "odin_sixdof_constraint_smoke"   "${EXTRA_LINKS}"
 }
 
 build_and_test "" 0 16

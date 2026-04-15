@@ -141,7 +141,7 @@ main :: proc() {
 	mutable_settings.SubShapes = &subshapes[0]
 	mutable_settings.SubShapesLen = len(subshapes)
 
-	compound: ^joltc.MutableCompoundShape
+	compound: ^joltc.Mutable_Compound_Shape
 	err: ^joltc.String
 	ok := joltc.JPC_MutableCompoundShapeSettings_Create(&mutable_settings, &compound, &err)
 	if !ok || compound == nil {
@@ -149,15 +149,14 @@ main :: proc() {
 	}
 	defer joltc.JPC_Shape_Release(cast(^joltc.Shape)compound)
 
-	idx0_shape := joltc.JPC_CompoundShape_GetSubShape_Shape(cast(^joltc.CompoundShape)compound, 0)
-	idx1_shape := joltc.JPC_CompoundShape_GetSubShape_Shape(cast(^joltc.CompoundShape)compound, 1)
+	idx0_shape := joltc.JPC_CompoundShape_GetSubShape_Shape(cast(^joltc.Compound_Shape)compound, 0)
+	idx1_shape := joltc.JPC_CompoundShape_GetSubShape_Shape(cast(^joltc.Compound_Shape)compound, 1)
 
 	if idx0_shape == nil || idx1_shape == nil {
 		fmt.eprintln("compound subshape lookup returned nil")
 		os.exit(1)
 	}
 
-	// Add a third shape, move it, then remove it again.
 	sub_c := create_box_shape(vec3(0.25, 0.25, 0.25))
 	defer joltc.JPC_Shape_Release(sub_c)
 

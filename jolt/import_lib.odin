@@ -23,16 +23,16 @@ when JPC_DOUBLE_PRECISION {
 	#assert(size_of(RVec3) == 32)
 	#assert(align_of(RVec3) == 32)
 
-	#assert(size_of(RMat44) == 80)
+	#assert(size_of(RMat44) == 96)
 	#assert(align_of(RMat44) == 32)
 
-	#assert(size_of(RShape_Cast) == 128)
+	#assert(size_of(RShape_Cast) == 160)
 	#assert(align_of(RShape_Cast) == 32)
 
 	#assert(offset_of(RShape_Cast, Shape) == 0)
 	#assert(offset_of(RShape_Cast, Scale) == 16)
 	#assert(offset_of(RShape_Cast, CenterOfMassStart) == 32)
-	#assert(offset_of(RShape_Cast, Direction) == 112)
+	#assert(offset_of(RShape_Cast, Direction) == 128)
 } else {
 	#assert(size_of(RVec3) == 16)
 	#assert(align_of(RVec3) == 16)
@@ -76,7 +76,7 @@ when JPC_DOUBLE_PRECISION {
 #assert(offset_of(Shape_Cast_Result, IsBackFaceHit) == 68)
 
 when JPC_DOUBLE_PRECISION {
-	#assert(size_of(Narrow_Phase_Query_Cast_Shape_Args) == 288)
+	#assert(size_of(Narrow_Phase_Query_Cast_Shape_Args) == 320)
 	#assert(align_of(Narrow_Phase_Query_Cast_Shape_Args) == 32)
 } else {
 	#assert(size_of(Narrow_Phase_Query_Cast_Shape_Args) == 224)

@@ -27,13 +27,6 @@ rvec3 :: proc(x, y, z: f32) -> joltc.RVec3 {
 	}
 }
 
-absf :: proc(x: f32) -> f32 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
 panic_with_jpc_error :: proc(prefix: string, err: ^joltc.String) -> ! {
 	if err != nil {
 		msg := joltc.JPC_String_c_str(err)
@@ -101,10 +94,18 @@ should_collide_object_pair :: proc "c" (
 	return true
 }
 
+absf :: proc(x: f32) -> f32 {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
 main :: proc() {
 	fmt.println("joltc sixdof constraint smoke test")
 
 	joltc.init()
+	defer joltc.shutdown()
 
 	bp_interface_fns := joltc.Broad_Phase_Layer_Interface_Fns {
 		GetNumBroadPhaseLayers = get_num_broad_phase_layers,
@@ -112,7 +113,8 @@ main :: proc() {
 	}
 	bp_interface := joltc.JPC_BroadPhaseLayerInterface_new(nil, bp_interface_fns)
 	if bp_interface == nil {
-		panic("JPC_BroadPhaseLayerInterface_new failed")
+		fmt.eprintln("JPC_BroadPhaseLayerInterface_new failed")
+		os.exit(1)
 	}
 	defer joltc.JPC_BroadPhaseLayerInterface_delete(bp_interface)
 
@@ -121,7 +123,8 @@ main :: proc() {
 	}
 	obj_vs_bp := joltc.JPC_ObjectVsBroadPhaseLayerFilter_new(nil, obj_vs_bp_fns)
 	if obj_vs_bp == nil {
-		panic("JPC_ObjectVsBroadPhaseLayerFilter_new failed")
+		fmt.eprintln("JPC_ObjectVsBroadPhaseLayerFilter_new failed")
+		os.exit(1)
 	}
 	defer joltc.JPC_ObjectVsBroadPhaseLayerFilter_delete(obj_vs_bp)
 
@@ -130,13 +133,15 @@ main :: proc() {
 	}
 	obj_pair := joltc.JPC_ObjectLayerPairFilter_new(nil, obj_pair_fns)
 	if obj_pair == nil {
-		panic("JPC_ObjectLayerPairFilter_new failed")
+		fmt.eprintln("JPC_ObjectLayerPairFilter_new failed")
+		os.exit(1)
 	}
 	defer joltc.JPC_ObjectLayerPairFilter_delete(obj_pair)
 
 	physics := joltc.JPC_PhysicsSystem_new()
 	if physics == nil {
-		panic("JPC_PhysicsSystem_new failed")
+		fmt.eprintln("JPC_PhysicsSystem_new failed")
+		os.exit(1)
 	}
 	defer joltc.JPC_PhysicsSystem_delete(physics)
 
@@ -144,12 +149,14 @@ main :: proc() {
 
 	body_interface := joltc.JPC_PhysicsSystem_GetBodyInterface(physics)
 	if body_interface == nil {
-		panic("JPC_PhysicsSystem_GetBodyInterface failed")
+		fmt.eprintln("JPC_PhysicsSystem_GetBodyInterface failed")
+		os.exit(1)
 	}
 
 	temp_allocator := joltc.JPC_TempAllocatorImpl_new(10 * 1024 * 1024)
 	if temp_allocator == nil {
-		panic("JPC_TempAllocatorImpl_new failed")
+		fmt.eprintln("JPC_TempAllocatorImpl_new failed")
+		os.exit(1)
 	}
 	defer joltc.JPC_TempAllocatorImpl_delete(temp_allocator)
 
@@ -159,7 +166,8 @@ main :: proc() {
 		-1,
 	)
 	if job_system_tp == nil {
-		panic("JPC_JobSystemThreadPool_new3 failed")
+		fmt.eprintln("JPC_JobSystemThreadPool_new3 failed")
+		os.exit(1)
 	}
 	defer joltc.JPC_JobSystemThreadPool_delete(job_system_tp)
 
@@ -182,32 +190,47 @@ main :: proc() {
 	body_b_settings.Position = rvec3(2, 0, 0)
 	body_b_settings.Rotation = identity_quat()
 
-	body_a_ptr := joltc.JPC_BodyInterface_CreateBody(body_interface, &body_a_settings)
-	if body_a_ptr == nil {
-		fmt.eprintln("JPC_BodyInterface_CreateBody failed for body_a")
-		os.exit(1)
-	}
-
-	body_b_ptr := joltc.JPC_BodyInterface_CreateBody(body_interface, &body_b_settings)
-	if body_b_ptr == nil {
-		fmt.eprintln("JPC_BodyInterface_CreateBody failed for body_b")
-		os.exit(1)
-	}
-
-	body_a_id := joltc.JPC_Body_GetID(body_a_ptr)
-	body_b_id := joltc.JPC_Body_GetID(body_b_ptr)
-
-	joltc.JPC_BodyInterface_AddBody(body_interface, body_a_id, .ACTIVATE)
-	joltc.JPC_BodyInterface_AddBody(body_interface, body_b_id, .ACTIVATE)
-
-	defer joltc.JPC_BodyInterface_RemoveBody(body_interface, body_b_id)
-	defer joltc.JPC_BodyInterface_DestroyBody(body_interface, body_b_id)
-	defer joltc.JPC_BodyInterface_RemoveBody(body_interface, body_a_id)
-	defer joltc.JPC_BodyInterface_DestroyBody(body_interface, body_a_id)
+	body_a_id := joltc.JPC_BodyInterface_CreateAndAddBody(
+		body_interface,
+		&body_a_settings,
+		.ACTIVATE,
+	)
+	body_b_id := joltc.JPC_BodyInterface_CreateAndAddBody(
+		body_interface,
+		&body_b_settings,
+		.ACTIVATE,
+	)
 
 	start_a := joltc.JPC_BodyInterface_GetPosition(body_interface, body_a_id)
 	start_b := joltc.JPC_BodyInterface_GetPosition(body_interface, body_b_id)
 	start_dist := absf(f32(start_b.x - start_a.x))
+
+	body_lock := joltc.JPC_PhysicsSystem_GetBodyLockInterface(physics)
+	if body_lock == nil {
+		fmt.eprintln("JPC_PhysicsSystem_GetBodyLockInterface failed")
+		os.exit(1)
+	}
+
+	lock_a := joltc.JPC_BodyLockRead_new(body_lock, body_a_id)
+	if lock_a == nil || !joltc.JPC_BodyLockRead_Succeeded(lock_a) {
+		fmt.eprintln("failed to read-lock body A")
+		os.exit(1)
+	}
+	body_a_ptr := cast(^joltc.Body)joltc.JPC_BodyLockRead_GetBody(lock_a)
+	joltc.JPC_BodyLockRead_delete(lock_a)
+
+	lock_b := joltc.JPC_BodyLockRead_new(body_lock, body_b_id)
+	if lock_b == nil || !joltc.JPC_BodyLockRead_Succeeded(lock_b) {
+		fmt.eprintln("failed to read-lock body B")
+		os.exit(1)
+	}
+	body_b_ptr := cast(^joltc.Body)joltc.JPC_BodyLockRead_GetBody(lock_b)
+	joltc.JPC_BodyLockRead_delete(lock_b)
+
+	if body_a_ptr == nil || body_b_ptr == nil {
+		fmt.eprintln("body lock returned nil body")
+		os.exit(1)
+	}
 
 	settings: joltc.SixDOF_Constraint_Settings
 	joltc.JPC_SixDOFConstraintSettings_default(&settings)
@@ -244,12 +267,9 @@ main :: proc() {
 		fmt.eprintln("JPC_SixDOFConstraintSettings_Create failed")
 		os.exit(1)
 	}
-
 	constraint := cast(^joltc.SixDOFConstraint)constraint_base
 
 	joltc.JPC_PhysicsSystem_AddConstraint(physics, constraint_base)
-	defer joltc.JPC_PhysicsSystem_RemoveConstraint(physics, constraint_base)
-	defer joltc.JPC_Constraint_Release(constraint_base)
 
 	joltc.JPC_BodyInterface_SetLinearVelocity(body_interface, body_b_id, vec3(8, 0, 0))
 
@@ -261,7 +281,6 @@ main :: proc() {
 			temp_allocator,
 			cast(^joltc.JobSystem)job_system_tp,
 		)
-
 		if update_err != joltc.PHYSICS_UPDATE_ERROR_NONE {
 			fmt.eprintf("Physics update error at step %v: %v\n", step, update_err)
 			os.exit(1)
@@ -316,5 +335,15 @@ main :: proc() {
 
 	fmt.println("sixdof constraint smoke test passed")
 
-	joltc.shutdown()
+	// Explicit destruction order:
+	// 1) remove constraint from system
+	// 2) release constraint reference
+	// 3) remove/destroy bodies
+	joltc.JPC_PhysicsSystem_RemoveConstraint(physics, constraint_base)
+	joltc.JPC_Constraint_Release(constraint_base)
+
+	joltc.JPC_BodyInterface_RemoveBody(body_interface, body_b_id)
+	joltc.JPC_BodyInterface_DestroyBody(body_interface, body_b_id)
+	joltc.JPC_BodyInterface_RemoveBody(body_interface, body_a_id)
+	joltc.JPC_BodyInterface_DestroyBody(body_interface, body_a_id)
 }

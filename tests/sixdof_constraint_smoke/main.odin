@@ -27,6 +27,13 @@ rvec3 :: proc(x, y, z: f32) -> joltc.RVec3 {
 	}
 }
 
+absf :: proc(x: f32) -> f32 {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
 panic_with_jpc_error :: proc(prefix: string, err: ^joltc.String) -> ! {
 	if err != nil {
 		msg := joltc.JPC_String_c_str(err)
@@ -94,18 +101,10 @@ should_collide_object_pair :: proc "c" (
 	return true
 }
 
-absf :: proc(x: f32) -> f32 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
 main :: proc() {
 	fmt.println("joltc sixdof constraint smoke test")
 
 	joltc.init()
-	defer joltc.shutdown()
 
 	bp_interface_fns := joltc.Broad_Phase_Layer_Interface_Fns {
 		GetNumBroadPhaseLayers = get_num_broad_phase_layers,
@@ -113,52 +112,41 @@ main :: proc() {
 	}
 	bp_interface := joltc.JPC_BroadPhaseLayerInterface_new(nil, bp_interface_fns)
 	if bp_interface == nil {
-		fmt.eprintln("JPC_BroadPhaseLayerInterface_new failed")
-		os.exit(1)
+		panic("JPC_BroadPhaseLayerInterface_new failed")
 	}
-	defer joltc.JPC_BroadPhaseLayerInterface_delete(bp_interface)
 
 	obj_vs_bp_fns := joltc.Object_Vs_Broad_Phase_Layer_Filter_Fns {
 		ShouldCollide = should_collide_object_vs_bp,
 	}
 	obj_vs_bp := joltc.JPC_ObjectVsBroadPhaseLayerFilter_new(nil, obj_vs_bp_fns)
 	if obj_vs_bp == nil {
-		fmt.eprintln("JPC_ObjectVsBroadPhaseLayerFilter_new failed")
-		os.exit(1)
+		panic("JPC_ObjectVsBroadPhaseLayerFilter_new failed")
 	}
-	defer joltc.JPC_ObjectVsBroadPhaseLayerFilter_delete(obj_vs_bp)
 
 	obj_pair_fns := joltc.Object_Layer_Pair_Filter_Fns {
 		ShouldCollide = should_collide_object_pair,
 	}
 	obj_pair := joltc.JPC_ObjectLayerPairFilter_new(nil, obj_pair_fns)
 	if obj_pair == nil {
-		fmt.eprintln("JPC_ObjectLayerPairFilter_new failed")
-		os.exit(1)
+		panic("JPC_ObjectLayerPairFilter_new failed")
 	}
-	defer joltc.JPC_ObjectLayerPairFilter_delete(obj_pair)
 
 	physics := joltc.JPC_PhysicsSystem_new()
 	if physics == nil {
-		fmt.eprintln("JPC_PhysicsSystem_new failed")
-		os.exit(1)
+		panic("JPC_PhysicsSystem_new failed")
 	}
-	defer joltc.JPC_PhysicsSystem_delete(physics)
 
 	joltc.JPC_PhysicsSystem_Init(physics, 1024, 0, 1024, 1024, bp_interface, obj_vs_bp, obj_pair)
 
 	body_interface := joltc.JPC_PhysicsSystem_GetBodyInterface(physics)
 	if body_interface == nil {
-		fmt.eprintln("JPC_PhysicsSystem_GetBodyInterface failed")
-		os.exit(1)
+		panic("JPC_PhysicsSystem_GetBodyInterface failed")
 	}
 
 	temp_allocator := joltc.JPC_TempAllocatorImpl_new(10 * 1024 * 1024)
 	if temp_allocator == nil {
-		fmt.eprintln("JPC_TempAllocatorImpl_new failed")
-		os.exit(1)
+		panic("JPC_TempAllocatorImpl_new failed")
 	}
-	defer joltc.JPC_TempAllocatorImpl_delete(temp_allocator)
 
 	job_system_tp := joltc.JPC_JobSystemThreadPool_new3(
 		joltc.JPC_MAX_PHYSICS_JOBS,
@@ -166,167 +154,169 @@ main :: proc() {
 		-1,
 	)
 	if job_system_tp == nil {
-		fmt.eprintln("JPC_JobSystemThreadPool_new3 failed")
-		os.exit(1)
+		panic("JPC_JobSystemThreadPool_new3 failed")
 	}
-	defer joltc.JPC_JobSystemThreadPool_delete(job_system_tp)
 
-	box_shape := create_box_shape(vec3(0.5, 0.5, 0.5))
-	defer joltc.JPC_Shape_Release(box_shape)
+	shape_a := create_box_shape(vec3(0.5, 0.5, 0.5))
+	shape_b := create_box_shape(vec3(0.5, 0.5, 0.5))
 
-	body_a_settings: joltc.Body_Creation_Settings
-	joltc.JPC_BodyCreationSettings_default(&body_a_settings)
-	body_a_settings.Shape = box_shape
-	body_a_settings.MotionType = .DYNAMIC
-	body_a_settings.ObjectLayer = MOVING_LAYER
-	body_a_settings.Position = rvec3(0, 0, 0)
-	body_a_settings.Rotation = identity_quat()
+	settings_a: joltc.Body_Creation_Settings
+	joltc.JPC_BodyCreationSettings_default(&settings_a)
+	settings_a.Shape = shape_a
+	settings_a.MotionType = .DYNAMIC
+	settings_a.ObjectLayer = MOVING_LAYER
+	settings_a.Position = rvec3(0, 0, 0)
+	settings_a.Rotation = identity_quat()
 
-	body_b_settings: joltc.Body_Creation_Settings
-	joltc.JPC_BodyCreationSettings_default(&body_b_settings)
-	body_b_settings.Shape = box_shape
-	body_b_settings.MotionType = .DYNAMIC
-	body_b_settings.ObjectLayer = MOVING_LAYER
-	body_b_settings.Position = rvec3(2, 0, 0)
-	body_b_settings.Rotation = identity_quat()
+	settings_b: joltc.Body_Creation_Settings
+	joltc.JPC_BodyCreationSettings_default(&settings_b)
+	settings_b.Shape = shape_b
+	settings_b.MotionType = .DYNAMIC
+	settings_b.ObjectLayer = MOVING_LAYER
+	settings_b.Position = rvec3(2, 0, 0)
+	settings_b.Rotation = identity_quat()
 
-	body_a_id := joltc.JPC_BodyInterface_CreateAndAddBody(
-		body_interface,
-		&body_a_settings,
-		.ACTIVATE,
-	)
-	body_b_id := joltc.JPC_BodyInterface_CreateAndAddBody(
-		body_interface,
-		&body_b_settings,
-		.ACTIVATE,
-	)
-
-	start_a := joltc.JPC_BodyInterface_GetPosition(body_interface, body_a_id)
-	start_b := joltc.JPC_BodyInterface_GetPosition(body_interface, body_b_id)
-	start_dist := absf(f32(start_b.x - start_a.x))
-
-	body_lock := joltc.JPC_PhysicsSystem_GetBodyLockInterface(physics)
-	if body_lock == nil {
-		fmt.eprintln("JPC_PhysicsSystem_GetBodyLockInterface failed")
+	body_a := joltc.JPC_BodyInterface_CreateBody(body_interface, &settings_a)
+	body_b := joltc.JPC_BodyInterface_CreateBody(body_interface, &settings_b)
+	if body_a == nil || body_b == nil {
+		fmt.eprintln("failed to create sixdof bodies")
 		os.exit(1)
 	}
 
-	lock_a := joltc.JPC_BodyLockRead_new(body_lock, body_a_id)
-	if lock_a == nil || !joltc.JPC_BodyLockRead_Succeeded(lock_a) {
-		fmt.eprintln("failed to read-lock body A")
-		os.exit(1)
-	}
-	body_a_ptr := cast(^joltc.Body)joltc.JPC_BodyLockRead_GetBody(lock_a)
-	joltc.JPC_BodyLockRead_delete(lock_a)
+	id_a := joltc.JPC_Body_GetID(body_a)
+	id_b := joltc.JPC_Body_GetID(body_b)
 
-	lock_b := joltc.JPC_BodyLockRead_new(body_lock, body_b_id)
-	if lock_b == nil || !joltc.JPC_BodyLockRead_Succeeded(lock_b) {
-		fmt.eprintln("failed to read-lock body B")
-		os.exit(1)
-	}
-	body_b_ptr := cast(^joltc.Body)joltc.JPC_BodyLockRead_GetBody(lock_b)
-	joltc.JPC_BodyLockRead_delete(lock_b)
+	sixdof_settings: joltc.SixDOF_Constraint_Settings
+	joltc.JPC_SixDOFConstraintSettings_default(&sixdof_settings)
+	sixdof_settings.Space = .WORLD_SPACE
 
-	if body_a_ptr == nil || body_b_ptr == nil {
-		fmt.eprintln("body lock returned nil body")
-		os.exit(1)
-	}
+	sixdof_settings.Position1 = rvec3(0, 0, 0)
+	sixdof_settings.AxisX1 = vec3(1, 0, 0)
+	sixdof_settings.AxisY1 = vec3(0, 1, 0)
 
-	settings: joltc.SixDOF_Constraint_Settings
-	joltc.JPC_SixDOFConstraintSettings_default(&settings)
-	settings.Space = .WORLD_SPACE
-	settings.Position1 = rvec3(0, 0, 0)
-	settings.AxisX1 = vec3(1, 0, 0)
-	settings.AxisY1 = vec3(0, 1, 0)
-	settings.Position2 = rvec3(2, 0, 0)
-	settings.AxisX2 = vec3(1, 0, 0)
-	settings.AxisY2 = vec3(0, 1, 0)
+	sixdof_settings.Position2 = rvec3(2, 0, 0)
+	sixdof_settings.AxisX2 = vec3(1, 0, 0)
+	sixdof_settings.AxisY2 = vec3(0, 1, 0)
 
-	settings.LimitMin[0] = 2
-	settings.LimitMax[0] = 2
-	settings.LimitMin[1] = 0
-	settings.LimitMax[1] = 0
-	settings.LimitMin[2] = 0
-	settings.LimitMax[2] = 0
-	settings.LimitMin[3] = 0
-	settings.LimitMax[3] = 0
-	settings.LimitMin[4] = 0
-	settings.LimitMax[4] = 0
-	settings.LimitMin[5] = 0
-	settings.LimitMax[5] = 0
+	// Lock everything, with translation X fixed at 2 units.
+	sixdof_settings.LimitMin[0] = 2.0
+	sixdof_settings.LimitMax[0] = 2.0
 
-	settings.MaxFriction[0] = 0
-	settings.MaxFriction[1] = 0
-	settings.MaxFriction[2] = 0
-	settings.MaxFriction[3] = 0
-	settings.MaxFriction[4] = 0
-	settings.MaxFriction[5] = 0
+	sixdof_settings.LimitMin[1] = 0.0
+	sixdof_settings.LimitMax[1] = 0.0
+	sixdof_settings.LimitMin[2] = 0.0
+	sixdof_settings.LimitMax[2] = 0.0
 
-	constraint_base := joltc.JPC_SixDOFConstraintSettings_Create(&settings, body_a_ptr, body_b_ptr)
+	sixdof_settings.LimitMin[3] = 0.0
+	sixdof_settings.LimitMax[3] = 0.0
+	sixdof_settings.LimitMin[4] = 0.0
+	sixdof_settings.LimitMax[4] = 0.0
+	sixdof_settings.LimitMin[5] = 0.0
+	sixdof_settings.LimitMax[5] = 0.0
+
+	constraint_base := joltc.JPC_SixDOFConstraintSettings_Create(&sixdof_settings, body_a, body_b)
 	if constraint_base == nil {
 		fmt.eprintln("JPC_SixDOFConstraintSettings_Create failed")
 		os.exit(1)
 	}
+
 	constraint := cast(^joltc.SixDOFConstraint)constraint_base
 
+	joltc.JPC_BodyInterface_AddBody(body_interface, id_a, .ACTIVATE)
+	joltc.JPC_BodyInterface_AddBody(body_interface, id_b, .ACTIVATE)
 	joltc.JPC_PhysicsSystem_AddConstraint(physics, constraint_base)
 
-	joltc.JPC_BodyInterface_SetLinearVelocity(body_interface, body_b_id, vec3(8, 0, 0))
+	start_a := joltc.JPC_BodyInterface_GetPosition(body_interface, id_a)
+	start_b := joltc.JPC_BodyInterface_GetPosition(body_interface, id_b)
+	start_dist := absf(f32(start_b.x - start_a.x))
+
+	joltc.JPC_BodyInterface_SetLinearVelocity(body_interface, id_b, vec3(8, 0, 0))
 
 	for step in 0 ..< 120 {
-		update_err := joltc.JPC_PhysicsSystem_Update(
+		err := joltc.JPC_PhysicsSystem_Update(
 			physics,
 			1.0 / 60.0,
 			1,
 			temp_allocator,
 			cast(^joltc.JobSystem)job_system_tp,
 		)
-		if update_err != joltc.PHYSICS_UPDATE_ERROR_NONE {
-			fmt.eprintf("Physics update error at step %v: %v\n", step, update_err)
+		if err != joltc.PHYSICS_UPDATE_ERROR_NONE {
+			fmt.eprintf("physics update failed at step %v: %v\n", step, err)
 			os.exit(1)
 		}
 	}
 
-	end_a := joltc.JPC_BodyInterface_GetPosition(body_interface, body_a_id)
-	end_b := joltc.JPC_BodyInterface_GetPosition(body_interface, body_b_id)
+	end_a := joltc.JPC_BodyInterface_GetPosition(body_interface, id_a)
+	end_b := joltc.JPC_BodyInterface_GetPosition(body_interface, id_b)
 	end_dist := absf(f32(end_b.x - end_a.x))
 
-	limit_min_x := joltc.JPC_SixDOFConstraint_GetLimitsMin(
-		constraint,
-		joltc.SIX_DOF_CONSTRAINT_AXIS_TRANSLATION_X,
-	)
-	limit_max_x := joltc.JPC_SixDOFConstraint_GetLimitsMax(
-		constraint,
-		joltc.SIX_DOF_CONSTRAINT_AXIS_TRANSLATION_X,
-	)
+	translation_min := joltc.JPC_SixDOFConstraint_GetTranslationLimitsMin(constraint)
+	translation_max := joltc.JPC_SixDOFConstraint_GetTranslationLimitsMax(constraint)
+
 	free_x := joltc.JPC_SixDOFConstraint_IsFreeAxis(
 		constraint,
 		joltc.SIX_DOF_CONSTRAINT_AXIS_TRANSLATION_X,
 	)
+	free_y := joltc.JPC_SixDOFConstraint_IsFreeAxis(
+		constraint,
+		joltc.SIX_DOF_CONSTRAINT_AXIS_TRANSLATION_Y,
+	)
+	free_z := joltc.JPC_SixDOFConstraint_IsFreeAxis(
+		constraint,
+		joltc.SIX_DOF_CONSTRAINT_AXIS_TRANSLATION_Z,
+	)
+
 	lambda_pos := joltc.JPC_SixDOFConstraint_GetTotalLambdaPosition(constraint)
 	lambda_rot := joltc.JPC_SixDOFConstraint_GetTotalLambdaRotation(constraint)
 
-	fmt.printf("start dist  = %v\n", start_dist)
-	fmt.printf("end dist    = %v\n", end_dist)
-	fmt.printf("limit min x = %v\n", limit_min_x)
-	fmt.printf("limit max x = %v\n", limit_max_x)
-	fmt.printf("free x      = %v\n", free_x)
-	fmt.printf("lambda pos  = (%v, %v, %v)\n", lambda_pos.x, lambda_pos.y, lambda_pos.z)
-	fmt.printf("lambda rot  = (%v, %v, %v)\n", lambda_rot.x, lambda_rot.y, lambda_rot.z)
+	fmt.printf("start dist       = %v\n", start_dist)
+	fmt.printf("end dist         = %v\n", end_dist)
+	fmt.printf(
+		"translation min  = (%v, %v, %v)\n",
+		translation_min.x,
+		translation_min.y,
+		translation_min.z,
+	)
+	fmt.printf(
+		"translation max  = (%v, %v, %v)\n",
+		translation_max.x,
+		translation_max.y,
+		translation_max.z,
+	)
+	fmt.printf("free x/y/z       = %v %v %v\n", free_x, free_y, free_z)
+	fmt.printf("lambda pos       = (%v, %v, %v)\n", lambda_pos.x, lambda_pos.y, lambda_pos.z)
+	fmt.printf("lambda rot       = (%v, %v, %v)\n", lambda_rot.x, lambda_rot.y, lambda_rot.z)
 
 	if free_x {
 		fmt.eprintln("translation X should not be free")
 		os.exit(1)
 	}
 
-	if limit_min_x != 2 || limit_max_x != 2 {
-		fmt.eprintln("unexpected sixdof X limits")
+	if free_y || free_z {
+		fmt.eprintln("translation Y/Z should not be free")
+		os.exit(1)
+	}
+
+	if translation_min.x != 2.0 || translation_max.x != 2.0 {
+		fmt.eprintf(
+			"unexpected translation X limits: min=%v max=%v\n",
+			translation_min.x,
+			translation_max.x,
+		)
+		os.exit(1)
+	}
+
+	if translation_min.y != 0.0 ||
+	   translation_max.y != 0.0 ||
+	   translation_min.z != 0.0 ||
+	   translation_max.z != 0.0 {
+		fmt.eprintln("unexpected translation Y/Z limits")
 		os.exit(1)
 	}
 
 	if absf(end_dist - start_dist) > 0.1 {
 		fmt.eprintf(
-			"constraint failed to preserve relative X distance: start=%v end=%v\n",
+			"sixdof constraint failed to preserve X separation: start=%v end=%v\n",
 			start_dist,
 			end_dist,
 		)
@@ -335,15 +325,23 @@ main :: proc() {
 
 	fmt.println("sixdof constraint smoke test passed")
 
-	// Explicit destruction order:
-	// 1) remove constraint from system
-	// 2) release constraint reference
-	// 3) remove/destroy bodies
 	joltc.JPC_PhysicsSystem_RemoveConstraint(physics, constraint_base)
-	joltc.JPC_Constraint_Release(constraint_base)
 
-	joltc.JPC_BodyInterface_RemoveBody(body_interface, body_b_id)
-	joltc.JPC_BodyInterface_DestroyBody(body_interface, body_b_id)
-	joltc.JPC_BodyInterface_RemoveBody(body_interface, body_a_id)
-	joltc.JPC_BodyInterface_DestroyBody(body_interface, body_a_id)
+	joltc.JPC_BodyInterface_RemoveBody(body_interface, id_b)
+	joltc.JPC_BodyInterface_DestroyBody(body_interface, id_b)
+
+	joltc.JPC_BodyInterface_RemoveBody(body_interface, id_a)
+	joltc.JPC_BodyInterface_DestroyBody(body_interface, id_a)
+
+	joltc.JPC_Shape_Release(shape_b)
+	joltc.JPC_Shape_Release(shape_a)
+
+	joltc.JPC_JobSystemThreadPool_delete(job_system_tp)
+	joltc.JPC_TempAllocatorImpl_delete(temp_allocator)
+	joltc.JPC_PhysicsSystem_delete(physics)
+	joltc.JPC_ObjectLayerPairFilter_delete(obj_pair)
+	joltc.JPC_ObjectVsBroadPhaseLayerFilter_delete(obj_vs_bp)
+	joltc.JPC_BroadPhaseLayerInterface_delete(bp_interface)
+
+	joltc.shutdown()
 }

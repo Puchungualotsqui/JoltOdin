@@ -1,0 +1,534 @@
+package joltc
+
+import "./jolt"
+
+// Re-export configuration constants
+JPC_OBJECT_LAYER_BITS :: jolt.JPC_OBJECT_LAYER_BITS
+JPC_DOUBLE_PRECISION :: jolt.JPC_DOUBLE_PRECISION
+
+JPC_MAX_PHYSICS_JOBS :: jolt.JPC_MAX_PHYSICS_JOBS
+JPC_MAX_PHYSICS_BARRIERS :: jolt.JPC_MAX_PHYSICS_BARRIERS
+JPC_DEFAULT_COLLISION_TOLERANCE :: jolt.JPC_DEFAULT_COLLISION_TOLERANCE
+JPC_DEFAULT_PENETRATION_TOLERANCE :: jolt.JPC_DEFAULT_PENETRATION_TOLERANCE
+JPC_DEFAULT_CONVEX_RADIUS :: jolt.JPC_DEFAULT_CONVEX_RADIUS
+JPC_CAPSULE_PROJECTION_SLOP :: jolt.JPC_CAPSULE_PROJECTION_SLOP
+JPC_CONTACT_POINTS_CAPACITY :: jolt.JPC_CONTACT_POINTS_CAPACITY
+
+// Re-export core initialization
+init :: jolt.init
+shutdown :: jolt.shutdown
+
+// Re-export enums / core public types most commonly used
+Shape_Type :: jolt.Shape_Type
+Shape_SubType :: jolt.Shape_SubType
+Physics_Update_Error :: jolt.Physics_Update_Error
+Constraint_Type :: jolt.Constraint_Type
+Constraint_SubType :: jolt.Constraint_SubType
+Constraint_Space :: jolt.Constraint_Space
+Motion_Type :: jolt.Motion_Type
+Motion_Quality :: jolt.Motion_Quality
+Override_Mass_Properties :: jolt.Override_Mass_Properties
+Ground_State :: jolt.Ground_State
+Activation :: jolt.Activation
+Validate_Result :: jolt.Validate_Result
+Back_Face_Mode :: jolt.Back_Face_Mode
+Body_Type :: jolt.Body_Type
+Allowed_DOFs :: jolt.Allowed_DOFs
+Features :: jolt.Features
+Active_Edge_Mode :: jolt.Active_Edge_Mode
+Collect_Faces_Mode :: jolt.Collect_Faces_Mode
+Swing_Type :: jolt.Swing_Type
+SixDOFConstraint_Axis :: jolt.SixDOFConstraint_Axis
+Spring_Mode :: jolt.Spring_Mode
+Motor_State :: jolt.Motor_State
+
+BodyID :: jolt.BodyID
+SubShapeID :: jolt.SubShapeID
+BroadPhaseLayer :: jolt.BroadPhaseLayer
+ObjectLayer :: jolt.ObjectLayer
+GroupID :: jolt.GroupID
+SubGroupID :: jolt.SubGroupID
+
+Float3 :: jolt.Float3
+Vec2 :: jolt.Vec2
+Vec3 :: jolt.Vec3
+Vec4 :: jolt.Vec4
+DVec3 :: jolt.DVec3
+Quat :: jolt.Quat
+Mat44 :: jolt.Mat44
+DMat44 :: jolt.DMat44
+Color :: jolt.Color
+RVec3 :: jolt.RVec3
+RMat44 :: jolt.RMat44
+Real :: jolt.Real
+Indexed_Triangle :: jolt.Indexed_Triangle
+Indexed_Triangle_No_Material :: jolt.Indexed_Triangle_No_Material
+Ray_Cast :: jolt.Ray_Cast
+RRay_Cast :: jolt.RRay_Cast
+Ray_Cast_Result :: jolt.Ray_Cast_Result
+Shape_Cast_Result :: jolt.Shape_Cast_Result
+Collide_Shape_Result :: jolt.Collide_Shape_Result
+Collision_Group :: jolt.Collision_Group
+Contact_Points :: jolt.Contact_Points
+Contact_Manifold :: jolt.Contact_Manifold
+Contact_Settings :: jolt.Contact_Settings
+SubShapeID_Pair :: jolt.SubShapeID_Pair
+Shape_Cast_Settings :: jolt.Shape_Cast_Settings
+Collide_Shape_Settings :: jolt.Collide_Shape_Settings
+Impulse :: jolt.Impulse
+Collision_Estimation_Result :: jolt.Collision_Estimation_Result
+Constraint_Settings :: jolt.Constraint_Settings
+Spring_Settings :: jolt.Spring_Settings
+Motor_Settings :: jolt.Motor_Settings
+SubShape_Settings :: jolt.SubShape_Settings
+Body_Creation_Settings :: jolt.Body_Creation_Settings
+RShape_Cast :: jolt.RShape_Cast
+
+Narrow_Phase_Query_Cast_Ray_Args :: jolt.Narrow_Phase_Query_Cast_Ray_Args
+Narrow_Phase_Query_Cast_Shape_Args :: jolt.Narrow_Phase_Query_Cast_Shape_Args
+Narrow_Phase_Query_Collide_Shape_Args :: jolt.Narrow_Phase_Query_Collide_Shape_Args
+
+Broad_Phase_Layer_Interface_Fns :: jolt.Broad_Phase_Layer_Interface_Fns
+Broad_Phase_Layer_Filter_Fns :: jolt.Broad_Phase_Layer_Filter_Fns
+Object_Layer_Filter_Fns :: jolt.Object_Layer_Filter_Fns
+Body_Filter_Fns :: jolt.Body_Filter_Fns
+Shape_Filter_Fns :: jolt.Shape_Filter_Fns
+Sim_Shape_Filter_Fns :: jolt.Sim_Shape_Filter_Fns
+Object_Vs_Broad_Phase_Layer_Filter_Fns :: jolt.Object_Vs_Broad_Phase_Layer_Filter_Fns
+Object_Layer_Pair_Filter_Fns :: jolt.Object_Layer_Pair_Filter_Fns
+Contact_Listener_Fns :: jolt.Contact_Listener_Fns
+Cast_Shape_Collector_Fns :: jolt.Cast_Shape_Collector_Fns
+Collide_Shape_Collector_Fns :: jolt.Collide_Shape_Collector_Fns
+
+Triangle_Shape_Settings :: jolt.Triangle_Shape_Settings
+Mesh_Shape_Settings :: jolt.Mesh_Shape_Settings
+Box_Shape_Settings :: jolt.Box_Shape_Settings
+Sphere_Shape_Settings :: jolt.Sphere_Shape_Settings
+Capsule_Shape_Settings :: jolt.Capsule_Shape_Settings
+Cylinder_Shape_Settings :: jolt.Cylinder_Shape_Settings
+Convex_Hull_Shape_Settings :: jolt.Convex_Hull_Shape_Settings
+Static_Compound_Shape_Settings :: jolt.Static_Compound_Shape_Settings
+Mutable_Compound_Shape_Settings :: jolt.Mutable_Compound_Shape_Settings
+
+Fixed_Constraint_Settings :: jolt.Fixed_Constraint_Settings
+SixDOF_Constraint_Settings :: jolt.SixDOF_Constraint_Settings
+Hinge_Constraint_Settings :: jolt.Hinge_Constraint_Settings
+Distance_Constraint_Settings :: jolt.Distance_Constraint_Settings
+Slider_Constraint_Settings :: jolt.Slider_Constraint_Settings
+
+// Re-export opaque handles
+Body :: jolt.Body
+Shape :: jolt.Shape
+CompoundShape :: jolt.CompoundShape
+MutableCompoundShape :: jolt.MutableCompoundShape
+Vertex_List :: jolt.Vertex_List
+Indexed_Triangle_List :: jolt.Indexed_Triangle_List
+TempAllocatorImpl :: jolt.TempAllocatorImpl
+JobSystem :: jolt.JobSystem
+JobSystemThreadPool :: jolt.JobSystemThreadPool
+JobSystemSingleThreaded :: jolt.JobSystemSingleThreaded
+GroupFilter :: jolt.GroupFilter
+BroadPhaseLayerInterface :: jolt.BroadPhaseLayerInterface
+BroadPhaseLayerFilter :: jolt.BroadPhaseLayerFilter
+ObjectLayerFilter :: jolt.ObjectLayerFilter
+BodyFilter :: jolt.BodyFilter
+ShapeFilter :: jolt.ShapeFilter
+SimShapeFilter :: jolt.SimShapeFilter
+ObjectVsBroadPhaseLayerFilter :: jolt.ObjectVsBroadPhaseLayerFilter
+ObjectLayerPairFilter :: jolt.ObjectLayerPairFilter
+ContactListener :: jolt.ContactListener
+CastShapeCollector :: jolt.CastShapeCollector
+CollideShapeCollector :: jolt.CollideShapeCollector
+String :: jolt.String
+Constraint :: jolt.Constraint
+TwoBodyConstraint :: jolt.TwoBodyConstraint
+FixedConstraint :: jolt.FixedConstraint
+DistanceConstraint :: jolt.DistanceConstraint
+SixDOFConstraint :: jolt.SixDOFConstraint
+HingeConstraint :: jolt.HingeConstraint
+SliderConstraint :: jolt.SliderConstraint
+BodyLockInterface :: jolt.BodyLockInterface
+BodyLockRead :: jolt.BodyLockRead
+BodyLockWrite :: jolt.BodyLockWrite
+BodyLockMultiRead :: jolt.BodyLockMultiRead
+BodyLockMultiWrite :: jolt.BodyLockMultiWrite
+BodyInterface :: jolt.BodyInterface
+NarrowPhaseQuery :: jolt.NarrowPhaseQuery
+PhysicsSystem :: jolt.PhysicsSystem
+
+// Re-export raw foreign procedures
+JPC_RegisterDefaultAllocator :: jolt.JPC_RegisterDefaultAllocator
+JPC_FactoryInit :: jolt.JPC_FactoryInit
+JPC_FactoryDelete :: jolt.JPC_FactoryDelete
+JPC_RegisterTypes :: jolt.JPC_RegisterTypes
+JPC_UnregisterTypes :: jolt.JPC_UnregisterTypes
+
+JPC_VertexList_new :: jolt.JPC_VertexList_new
+JPC_VertexList_delete :: jolt.JPC_VertexList_delete
+
+JPC_IndexedTriangleList_new :: jolt.JPC_IndexedTriangleList_new
+JPC_IndexedTriangleList_delete :: jolt.JPC_IndexedTriangleList_delete
+
+JPC_Shape_GetRefCount :: jolt.JPC_Shape_GetRefCount
+JPC_Shape_AddRef :: jolt.JPC_Shape_AddRef
+JPC_Shape_Release :: jolt.JPC_Shape_Release
+JPC_Shape_GetUserData :: jolt.JPC_Shape_GetUserData
+JPC_Shape_SetUserData :: jolt.JPC_Shape_SetUserData
+JPC_Shape_GetType :: jolt.JPC_Shape_GetType
+JPC_Shape_GetSubType :: jolt.JPC_Shape_GetSubType
+JPC_Shape_GetSubShapeUserData :: jolt.JPC_Shape_GetSubShapeUserData
+JPC_Shape_GetCenterOfMass :: jolt.JPC_Shape_GetCenterOfMass
+JPC_Shape_GetVolume :: jolt.JPC_Shape_GetVolume
+
+JPC_CompoundShape_GetSubShape_Shape :: jolt.JPC_CompoundShape_GetSubShape_Shape
+JPC_CompoundShape_GetSubShapeIndexFromID :: jolt.JPC_CompoundShape_GetSubShapeIndexFromID
+
+JPC_TempAllocatorImpl_new :: jolt.JPC_TempAllocatorImpl_new
+JPC_TempAllocatorImpl_delete :: jolt.JPC_TempAllocatorImpl_delete
+
+JPC_JobSystemThreadPool_new2 :: jolt.JPC_JobSystemThreadPool_new2
+JPC_JobSystemThreadPool_new3 :: jolt.JPC_JobSystemThreadPool_new3
+JPC_JobSystemThreadPool_delete :: jolt.JPC_JobSystemThreadPool_delete
+JPC_JobSystemSingleThreaded_new :: jolt.JPC_JobSystemSingleThreaded_new
+JPC_JobSystemSingleThreaded_delete :: jolt.JPC_JobSystemSingleThreaded_delete
+
+JPC_GroupFilter_new :: jolt.JPC_GroupFilter_new
+JPC_GroupFilter_delete :: jolt.JPC_GroupFilter_delete
+
+JPC_BroadPhaseLayerInterface_new :: jolt.JPC_BroadPhaseLayerInterface_new
+JPC_BroadPhaseLayerInterface_delete :: jolt.JPC_BroadPhaseLayerInterface_delete
+JPC_BroadPhaseLayerFilter_new :: jolt.JPC_BroadPhaseLayerFilter_new
+JPC_BroadPhaseLayerFilter_delete :: jolt.JPC_BroadPhaseLayerFilter_delete
+JPC_ObjectLayerFilter_new :: jolt.JPC_ObjectLayerFilter_new
+JPC_ObjectLayerFilter_delete :: jolt.JPC_ObjectLayerFilter_delete
+JPC_BodyFilter_new :: jolt.JPC_BodyFilter_new
+JPC_BodyFilter_delete :: jolt.JPC_BodyFilter_delete
+JPC_ShapeFilter_new :: jolt.JPC_ShapeFilter_new
+JPC_ShapeFilter_delete :: jolt.JPC_ShapeFilter_delete
+JPC_SimShapeFilter_new :: jolt.JPC_SimShapeFilter_new
+JPC_SimShapeFilter_delete :: jolt.JPC_SimShapeFilter_delete
+JPC_ObjectVsBroadPhaseLayerFilter_new :: jolt.JPC_ObjectVsBroadPhaseLayerFilter_new
+JPC_ObjectVsBroadPhaseLayerFilter_delete :: jolt.JPC_ObjectVsBroadPhaseLayerFilter_delete
+JPC_ObjectLayerPairFilter_new :: jolt.JPC_ObjectLayerPairFilter_new
+JPC_ObjectLayerPairFilter_delete :: jolt.JPC_ObjectLayerPairFilter_delete
+
+JPC_ContactListener_new :: jolt.JPC_ContactListener_new
+JPC_ContactListener_delete :: jolt.JPC_ContactListener_delete
+JPC_EstimateCollisionResponse :: jolt.JPC_EstimateCollisionResponse
+
+JPC_CastShapeCollector_new :: jolt.JPC_CastShapeCollector_new
+JPC_CastShapeCollector_delete :: jolt.JPC_CastShapeCollector_delete
+JPC_CastShapeCollector_UpdateEarlyOutFraction :: jolt.JPC_CastShapeCollector_UpdateEarlyOutFraction
+
+JPC_CollideShapeCollector_new :: jolt.JPC_CollideShapeCollector_new
+JPC_CollideShapeCollector_delete :: jolt.JPC_CollideShapeCollector_delete
+JPC_CollideShapeCollector_UpdateEarlyOutFraction ::
+	jolt.JPC_CollideShapeCollector_UpdateEarlyOutFraction
+
+JPC_String_delete :: jolt.JPC_String_delete
+JPC_String_c_str :: jolt.JPC_String_c_str
+
+JPC_Constraint_GetRefCount :: jolt.JPC_Constraint_GetRefCount
+JPC_Constraint_AddRef :: jolt.JPC_Constraint_AddRef
+JPC_Constraint_Release :: jolt.JPC_Constraint_Release
+JPC_Constraint_delete :: jolt.JPC_Constraint_delete
+JPC_Constraint_GetConstraintPriority :: jolt.JPC_Constraint_GetConstraintPriority
+JPC_Constraint_SetConstraintPriority :: jolt.JPC_Constraint_SetConstraintPriority
+JPC_Constraint_GetNumVelocityStepsOverride :: jolt.JPC_Constraint_GetNumVelocityStepsOverride
+JPC_Constraint_SetNumVelocityStepsOverride :: jolt.JPC_Constraint_SetNumVelocityStepsOverride
+JPC_Constraint_GetNumPositionStepsOverride :: jolt.JPC_Constraint_GetNumPositionStepsOverride
+JPC_Constraint_SetNumPositionStepsOverride :: jolt.JPC_Constraint_SetNumPositionStepsOverride
+JPC_Constraint_GetEnabled :: jolt.JPC_Constraint_GetEnabled
+JPC_Constraint_SetEnabled :: jolt.JPC_Constraint_SetEnabled
+JPC_Constraint_GetUserData :: jolt.JPC_Constraint_GetUserData
+JPC_Constraint_SetUserData :: jolt.JPC_Constraint_SetUserData
+JPC_Constraint_NotifyShapeChanged :: jolt.JPC_Constraint_NotifyShapeChanged
+
+JPC_TwoBodyConstraint_GetBody1 :: jolt.JPC_TwoBodyConstraint_GetBody1
+JPC_TwoBodyConstraint_GetBody2 :: jolt.JPC_TwoBodyConstraint_GetBody2
+JPC_TwoBodyConstraint_GetConstraintToBody1Matrix ::
+	jolt.JPC_TwoBodyConstraint_GetConstraintToBody1Matrix
+JPC_TwoBodyConstraint_GetConstraintToBody2Matrix ::
+	jolt.JPC_TwoBodyConstraint_GetConstraintToBody2Matrix
+
+JPC_FixedConstraint_GetTotalLambdaPosition :: jolt.JPC_FixedConstraint_GetTotalLambdaPosition
+JPC_FixedConstraint_GetTotalLambdaRotation :: jolt.JPC_FixedConstraint_GetTotalLambdaRotation
+
+JPC_DistanceConstraint_GetTotalLambdaPosition :: jolt.JPC_DistanceConstraint_GetTotalLambdaPosition
+
+JPC_SixDOFConstraint_GetTranslationLimitsMin :: jolt.JPC_SixDOFConstraint_GetTranslationLimitsMin
+JPC_SixDOFConstraint_GetTranslationLimitsMax :: jolt.JPC_SixDOFConstraint_GetTranslationLimitsMax
+JPC_SixDOFConstraint_SetTranslationLimits :: jolt.JPC_SixDOFConstraint_SetTranslationLimits
+JPC_SixDOFConstraint_GetRotationLimitsMin :: jolt.JPC_SixDOFConstraint_GetRotationLimitsMin
+JPC_SixDOFConstraint_GetRotationLimitsMax :: jolt.JPC_SixDOFConstraint_GetRotationLimitsMax
+JPC_SixDOFConstraint_SetRotationLimits :: jolt.JPC_SixDOFConstraint_SetRotationLimits
+JPC_SixDOFConstraint_GetLimitsMin :: jolt.JPC_SixDOFConstraint_GetLimitsMin
+JPC_SixDOFConstraint_GetLimitsMax :: jolt.JPC_SixDOFConstraint_GetLimitsMax
+JPC_SixDOFConstraint_IsFreeAxis :: jolt.JPC_SixDOFConstraint_IsFreeAxis
+JPC_SixDOFConstraint_SetMaxFriction :: jolt.JPC_SixDOFConstraint_SetMaxFriction
+JPC_SixDOFConstraint_GetMaxFriction :: jolt.JPC_SixDOFConstraint_GetMaxFriction
+JPC_SixDOFConstraint_GetRotationInConstraintSpace ::
+	jolt.JPC_SixDOFConstraint_GetRotationInConstraintSpace
+JPC_SixDOFConstraint_GetTargetVelocityCS :: jolt.JPC_SixDOFConstraint_GetTargetVelocityCS
+JPC_SixDOFConstraint_SetTargetVelocityCS :: jolt.JPC_SixDOFConstraint_SetTargetVelocityCS
+JPC_SixDOFConstraint_GetTargetAngularVelocityCS ::
+	jolt.JPC_SixDOFConstraint_GetTargetAngularVelocityCS
+JPC_SixDOFConstraint_SetTargetAngularVelocityCS ::
+	jolt.JPC_SixDOFConstraint_SetTargetAngularVelocityCS
+JPC_SixDOFConstraint_GetTargetPositionCS :: jolt.JPC_SixDOFConstraint_GetTargetPositionCS
+JPC_SixDOFConstraint_SetTargetPositionCS :: jolt.JPC_SixDOFConstraint_SetTargetPositionCS
+JPC_SixDOFConstraint_GetTargetOrientationCS :: jolt.JPC_SixDOFConstraint_GetTargetOrientationCS
+JPC_SixDOFConstraint_SetTargetOrientationCS :: jolt.JPC_SixDOFConstraint_SetTargetOrientationCS
+JPC_SixDOFConstraint_SetTargetOrientationBS :: jolt.JPC_SixDOFConstraint_SetTargetOrientationBS
+JPC_SixDOFConstraint_GetTotalLambdaPosition :: jolt.JPC_SixDOFConstraint_GetTotalLambdaPosition
+JPC_SixDOFConstraint_GetTotalLambdaRotation :: jolt.JPC_SixDOFConstraint_GetTotalLambdaRotation
+JPC_SixDOFConstraint_GetTotalLambdaMotorTranslation ::
+	jolt.JPC_SixDOFConstraint_GetTotalLambdaMotorTranslation
+JPC_SixDOFConstraint_GetTotalLambdaMotorRotation ::
+	jolt.JPC_SixDOFConstraint_GetTotalLambdaMotorRotation
+
+JPC_HingeConstraint_SetMotorState :: jolt.JPC_HingeConstraint_SetMotorState
+JPC_HingeConstraint_GetMotorState :: jolt.JPC_HingeConstraint_GetMotorState
+JPC_HingeConstraint_SetTargetAngularVelocity :: jolt.JPC_HingeConstraint_SetTargetAngularVelocity
+JPC_HingeConstraint_GetTargetAngularVelocity :: jolt.JPC_HingeConstraint_GetTargetAngularVelocity
+JPC_HingeConstraint_SetTargetAngle :: jolt.JPC_HingeConstraint_SetTargetAngle
+JPC_HingeConstraint_GetTargetAngle :: jolt.JPC_HingeConstraint_GetTargetAngle
+JPC_HingeConstraint_GetTotalLambdaPosition :: jolt.JPC_HingeConstraint_GetTotalLambdaPosition
+JPC_HingeConstraint_GetTotalLambdaRotation :: jolt.JPC_HingeConstraint_GetTotalLambdaRotation
+JPC_HingeConstraint_GetTotalLambdaRotationLimits ::
+	jolt.JPC_HingeConstraint_GetTotalLambdaRotationLimits
+JPC_HingeConstraint_GetTotalLambdaMotor :: jolt.JPC_HingeConstraint_GetTotalLambdaMotor
+
+JPC_SliderConstraint_SetMotorState :: jolt.JPC_SliderConstraint_SetMotorState
+JPC_SliderConstraint_GetMotorState :: jolt.JPC_SliderConstraint_GetMotorState
+JPC_SliderConstraint_SetTargetVelocity :: jolt.JPC_SliderConstraint_SetTargetVelocity
+JPC_SliderConstraint_GetTargetVelocity :: jolt.JPC_SliderConstraint_GetTargetVelocity
+JPC_SliderConstraint_SetTargetPosition :: jolt.JPC_SliderConstraint_SetTargetPosition
+JPC_SliderConstraint_GetTargetPosition :: jolt.JPC_SliderConstraint_GetTargetPosition
+JPC_SliderConstraint_GetTotalLambdaPosition :: jolt.JPC_SliderConstraint_GetTotalLambdaPosition
+JPC_SliderConstraint_GetTotalLambdaPositionLimits ::
+	jolt.JPC_SliderConstraint_GetTotalLambdaPositionLimits
+JPC_SliderConstraint_GetTotalLambdaRotation :: jolt.JPC_SliderConstraint_GetTotalLambdaRotation
+JPC_SliderConstraint_GetTotalLambdaMotor :: jolt.JPC_SliderConstraint_GetTotalLambdaMotor
+
+JPC_ConstraintSettings_default :: jolt.JPC_ConstraintSettings_default
+JPC_SpringSettings_default :: jolt.JPC_SpringSettings_default
+JPC_MotorSettings_default :: jolt.JPC_MotorSettings_default
+JPC_FixedConstraintSettings_default :: jolt.JPC_FixedConstraintSettings_default
+JPC_FixedConstraintSettings_Create :: jolt.JPC_FixedConstraintSettings_Create
+JPC_SixDOFConstraintSettings_default :: jolt.JPC_SixDOFConstraintSettings_default
+JPC_SixDOFConstraintSettings_Create :: jolt.JPC_SixDOFConstraintSettings_Create
+JPC_HingeConstraintSettings_default :: jolt.JPC_HingeConstraintSettings_default
+JPC_HingeConstraintSettings_Create :: jolt.JPC_HingeConstraintSettings_Create
+JPC_DistanceConstraintSettings_default :: jolt.JPC_DistanceConstraintSettings_default
+JPC_DistanceConstraintSettings_Create :: jolt.JPC_DistanceConstraintSettings_Create
+JPC_SliderConstraintSettings_default :: jolt.JPC_SliderConstraintSettings_default
+JPC_SliderConstraintSettings_Create :: jolt.JPC_SliderConstraintSettings_Create
+
+JPC_TriangleShapeSettings_default :: jolt.JPC_TriangleShapeSettings_default
+JPC_TriangleShapeSettings_Create :: jolt.JPC_TriangleShapeSettings_Create
+JPC_MeshShapeSettings_default :: jolt.JPC_MeshShapeSettings_default
+JPC_MeshShapeSettings_Create :: jolt.JPC_MeshShapeSettings_Create
+JPC_BoxShapeSettings_default :: jolt.JPC_BoxShapeSettings_default
+JPC_BoxShapeSettings_Create :: jolt.JPC_BoxShapeSettings_Create
+JPC_SphereShapeSettings_default :: jolt.JPC_SphereShapeSettings_default
+JPC_SphereShapeSettings_Create :: jolt.JPC_SphereShapeSettings_Create
+JPC_CapsuleShapeSettings_default :: jolt.JPC_CapsuleShapeSettings_default
+JPC_CapsuleShapeSettings_Create :: jolt.JPC_CapsuleShapeSettings_Create
+JPC_CylinderShapeSettings_default :: jolt.JPC_CylinderShapeSettings_default
+JPC_CylinderShapeSettings_Create :: jolt.JPC_CylinderShapeSettings_Create
+JPC_ConvexHullShapeSettings_default :: jolt.JPC_ConvexHullShapeSettings_default
+JPC_ConvexHullShapeSettings_Create :: jolt.JPC_ConvexHullShapeSettings_Create
+JPC_SubShapeSettings_default :: jolt.JPC_SubShapeSettings_default
+JPC_StaticCompoundShapeSettings_default :: jolt.JPC_StaticCompoundShapeSettings_default
+JPC_StaticCompoundShapeSettings_Create :: jolt.JPC_StaticCompoundShapeSettings_Create
+JPC_MutableCompoundShape_AddShape :: jolt.JPC_MutableCompoundShape_AddShape
+JPC_MutableCompoundShape_RemoveShape :: jolt.JPC_MutableCompoundShape_RemoveShape
+JPC_MutableCompoundShape_ModifyShape :: jolt.JPC_MutableCompoundShape_ModifyShape
+JPC_MutableCompoundShape_ModifyShape2 :: jolt.JPC_MutableCompoundShape_ModifyShape2
+JPC_MutableCompoundShape_AdjustCenterOfMass :: jolt.JPC_MutableCompoundShape_AdjustCenterOfMass
+JPC_MutableCompoundShapeSettings_default :: jolt.JPC_MutableCompoundShapeSettings_default
+JPC_MutableCompoundShapeSettings_Create :: jolt.JPC_MutableCompoundShapeSettings_Create
+
+JPC_BodyCreationSettings_default :: jolt.JPC_BodyCreationSettings_default
+JPC_BodyCreationSettings_new :: jolt.JPC_BodyCreationSettings_new
+
+JPC_Body_GetID :: jolt.JPC_Body_GetID
+JPC_Body_GetBodyType :: jolt.JPC_Body_GetBodyType
+JPC_Body_IsRigidBody :: jolt.JPC_Body_IsRigidBody
+JPC_Body_IsSoftBody :: jolt.JPC_Body_IsSoftBody
+JPC_Body_IsActive :: jolt.JPC_Body_IsActive
+JPC_Body_IsStatic :: jolt.JPC_Body_IsStatic
+JPC_Body_IsKinematic :: jolt.JPC_Body_IsKinematic
+JPC_Body_IsDynamic :: jolt.JPC_Body_IsDynamic
+JPC_Body_CanBeKinematicOrDynamic :: jolt.JPC_Body_CanBeKinematicOrDynamic
+JPC_Body_SetIsSensor :: jolt.JPC_Body_SetIsSensor
+JPC_Body_IsSensor :: jolt.JPC_Body_IsSensor
+JPC_Body_SetCollideKinematicVsNonDynamic :: jolt.JPC_Body_SetCollideKinematicVsNonDynamic
+JPC_Body_GetCollideKinematicVsNonDynamic :: jolt.JPC_Body_GetCollideKinematicVsNonDynamic
+JPC_Body_SetUseManifoldReduction :: jolt.JPC_Body_SetUseManifoldReduction
+JPC_Body_GetUseManifoldReduction :: jolt.JPC_Body_GetUseManifoldReduction
+JPC_Body_GetUseManifoldReductionWithBody :: jolt.JPC_Body_GetUseManifoldReductionWithBody
+JPC_Body_SetApplyGyroscopicForce :: jolt.JPC_Body_SetApplyGyroscopicForce
+JPC_Body_GetApplyGyroscopicForce :: jolt.JPC_Body_GetApplyGyroscopicForce
+JPC_Body_SetEnhancedInternalEdgeRemoval :: jolt.JPC_Body_SetEnhancedInternalEdgeRemoval
+JPC_Body_GetEnhancedInternalEdgeRemoval :: jolt.JPC_Body_GetEnhancedInternalEdgeRemoval
+JPC_Body_GetEnhancedInternalEdgeRemovalWithBody ::
+	jolt.JPC_Body_GetEnhancedInternalEdgeRemovalWithBody
+JPC_Body_GetMotionType :: jolt.JPC_Body_GetMotionType
+JPC_Body_SetMotionType :: jolt.JPC_Body_SetMotionType
+JPC_Body_GetBroadPhaseLayer :: jolt.JPC_Body_GetBroadPhaseLayer
+JPC_Body_GetObjectLayer :: jolt.JPC_Body_GetObjectLayer
+JPC_Body_GetAllowSleeping :: jolt.JPC_Body_GetAllowSleeping
+JPC_Body_SetAllowSleeping :: jolt.JPC_Body_SetAllowSleeping
+JPC_Body_ResetSleepTimer :: jolt.JPC_Body_ResetSleepTimer
+JPC_Body_GetFriction :: jolt.JPC_Body_GetFriction
+JPC_Body_SetFriction :: jolt.JPC_Body_SetFriction
+JPC_Body_GetRestitution :: jolt.JPC_Body_GetRestitution
+JPC_Body_SetRestitution :: jolt.JPC_Body_SetRestitution
+JPC_Body_GetLinearVelocity :: jolt.JPC_Body_GetLinearVelocity
+JPC_Body_SetLinearVelocity :: jolt.JPC_Body_SetLinearVelocity
+JPC_Body_SetLinearVelocityClamped :: jolt.JPC_Body_SetLinearVelocityClamped
+JPC_Body_GetAngularVelocity :: jolt.JPC_Body_GetAngularVelocity
+JPC_Body_SetAngularVelocity :: jolt.JPC_Body_SetAngularVelocity
+JPC_Body_SetAngularVelocityClamped :: jolt.JPC_Body_SetAngularVelocityClamped
+JPC_Body_GetPointVelocityCOM :: jolt.JPC_Body_GetPointVelocityCOM
+JPC_Body_GetPointVelocity :: jolt.JPC_Body_GetPointVelocity
+JPC_Body_AddForce :: jolt.JPC_Body_AddForce
+JPC_Body_AddForceAtPoint :: jolt.JPC_Body_AddForceAtPoint
+JPC_Body_AddTorque :: jolt.JPC_Body_AddTorque
+JPC_Body_GetAccumulatedForce :: jolt.JPC_Body_GetAccumulatedForce
+JPC_Body_GetAccumulatedTorque :: jolt.JPC_Body_GetAccumulatedTorque
+JPC_Body_ResetForce :: jolt.JPC_Body_ResetForce
+JPC_Body_ResetTorque :: jolt.JPC_Body_ResetTorque
+JPC_Body_ResetMotion :: jolt.JPC_Body_ResetMotion
+JPC_Body_GetInverseInertia :: jolt.JPC_Body_GetInverseInertia
+JPC_Body_AddImpulse :: jolt.JPC_Body_AddImpulse
+JPC_Body_AddImpulse2 :: jolt.JPC_Body_AddImpulse2
+JPC_Body_AddAngularImpulse :: jolt.JPC_Body_AddAngularImpulse
+JPC_Body_MoveKinematic :: jolt.JPC_Body_MoveKinematic
+JPC_Body_ApplyBuoyancyImpulse :: jolt.JPC_Body_ApplyBuoyancyImpulse
+JPC_Body_IsInBroadPhase :: jolt.JPC_Body_IsInBroadPhase
+JPC_Body_IsCollisionCacheInvalid :: jolt.JPC_Body_IsCollisionCacheInvalid
+JPC_Body_GetShape :: jolt.JPC_Body_GetShape
+JPC_Body_GetPosition :: jolt.JPC_Body_GetPosition
+JPC_Body_GetRotation :: jolt.JPC_Body_GetRotation
+JPC_Body_GetWorldTransform :: jolt.JPC_Body_GetWorldTransform
+JPC_Body_GetCenterOfMassPosition :: jolt.JPC_Body_GetCenterOfMassPosition
+JPC_Body_GetCenterOfMassTransform :: jolt.JPC_Body_GetCenterOfMassTransform
+JPC_Body_GetInverseCenterOfMassTransform :: jolt.JPC_Body_GetInverseCenterOfMassTransform
+JPC_Body_GetUserData :: jolt.JPC_Body_GetUserData
+JPC_Body_SetUserData :: jolt.JPC_Body_SetUserData
+JPC_Body_GetWorldSpaceSurfaceNormal :: jolt.JPC_Body_GetWorldSpaceSurfaceNormal
+
+JPC_BodyLockRead_new :: jolt.JPC_BodyLockRead_new
+JPC_BodyLockRead_delete :: jolt.JPC_BodyLockRead_delete
+JPC_BodyLockRead_Succeeded :: jolt.JPC_BodyLockRead_Succeeded
+JPC_BodyLockRead_GetBody :: jolt.JPC_BodyLockRead_GetBody
+
+JPC_BodyLockWrite_new :: jolt.JPC_BodyLockWrite_new
+JPC_BodyLockWrite_delete :: jolt.JPC_BodyLockWrite_delete
+JPC_BodyLockWrite_Succeeded :: jolt.JPC_BodyLockWrite_Succeeded
+JPC_BodyLockWrite_GetBody :: jolt.JPC_BodyLockWrite_GetBody
+
+JPC_BodyLockMultiRead_new :: jolt.JPC_BodyLockMultiRead_new
+JPC_BodyLockMultiRead_delete :: jolt.JPC_BodyLockMultiRead_delete
+JPC_BodyLockMultiRead_GetBody :: jolt.JPC_BodyLockMultiRead_GetBody
+
+JPC_BodyLockMultiWrite_new :: jolt.JPC_BodyLockMultiWrite_new
+JPC_BodyLockMultiWrite_delete :: jolt.JPC_BodyLockMultiWrite_delete
+JPC_BodyLockMultiWrite_GetBody :: jolt.JPC_BodyLockMultiWrite_GetBody
+
+JPC_BodyInterface_CreateBody :: jolt.JPC_BodyInterface_CreateBody
+JPC_BodyInterface_CreateBodyWithID :: jolt.JPC_BodyInterface_CreateBodyWithID
+JPC_BodyInterface_CreateBodyWithoutID :: jolt.JPC_BodyInterface_CreateBodyWithoutID
+JPC_BodyInterface_DestroyBodyWithoutID :: jolt.JPC_BodyInterface_DestroyBodyWithoutID
+JPC_BodyInterface_AssignBodyID :: jolt.JPC_BodyInterface_AssignBodyID
+JPC_BodyInterface_UnassignBodyID :: jolt.JPC_BodyInterface_UnassignBodyID
+JPC_BodyInterface_UnassignBodyIDs :: jolt.JPC_BodyInterface_UnassignBodyIDs
+JPC_BodyInterface_DestroyBody :: jolt.JPC_BodyInterface_DestroyBody
+JPC_BodyInterface_DestroyBodies :: jolt.JPC_BodyInterface_DestroyBodies
+JPC_BodyInterface_AddBody :: jolt.JPC_BodyInterface_AddBody
+JPC_BodyInterface_RemoveBody :: jolt.JPC_BodyInterface_RemoveBody
+JPC_BodyInterface_IsAdded :: jolt.JPC_BodyInterface_IsAdded
+JPC_BodyInterface_CreateAndAddBody :: jolt.JPC_BodyInterface_CreateAndAddBody
+JPC_BodyInterface_AddBodiesPrepare :: jolt.JPC_BodyInterface_AddBodiesPrepare
+JPC_BodyInterface_AddBodiesFinalize :: jolt.JPC_BodyInterface_AddBodiesFinalize
+JPC_BodyInterface_AddBodiesAbort :: jolt.JPC_BodyInterface_AddBodiesAbort
+JPC_BodyInterface_RemoveBodies :: jolt.JPC_BodyInterface_RemoveBodies
+JPC_BodyInterface_ActivateBody :: jolt.JPC_BodyInterface_ActivateBody
+JPC_BodyInterface_ActivateBodies :: jolt.JPC_BodyInterface_ActivateBodies
+JPC_BodyInterface_DeactivateBody :: jolt.JPC_BodyInterface_DeactivateBody
+JPC_BodyInterface_DeactivateBodies :: jolt.JPC_BodyInterface_DeactivateBodies
+JPC_BodyInterface_IsActive :: jolt.JPC_BodyInterface_IsActive
+JPC_BodyInterface_GetShape :: jolt.JPC_BodyInterface_GetShape
+JPC_BodyInterface_SetShape :: jolt.JPC_BodyInterface_SetShape
+JPC_BodyInterface_NotifyShapeChanged :: jolt.JPC_BodyInterface_NotifyShapeChanged
+JPC_BodyInterface_SetObjectLayer :: jolt.JPC_BodyInterface_SetObjectLayer
+JPC_BodyInterface_GetObjectLayer :: jolt.JPC_BodyInterface_GetObjectLayer
+JPC_BodyInterface_SetPositionAndRotation :: jolt.JPC_BodyInterface_SetPositionAndRotation
+JPC_BodyInterface_SetPositionAndRotationWhenChanged ::
+	jolt.JPC_BodyInterface_SetPositionAndRotationWhenChanged
+JPC_BodyInterface_GetPositionAndRotation :: jolt.JPC_BodyInterface_GetPositionAndRotation
+JPC_BodyInterface_SetPosition :: jolt.JPC_BodyInterface_SetPosition
+JPC_BodyInterface_GetPosition :: jolt.JPC_BodyInterface_GetPosition
+JPC_BodyInterface_GetCenterOfMassPosition :: jolt.JPC_BodyInterface_GetCenterOfMassPosition
+JPC_BodyInterface_SetRotation :: jolt.JPC_BodyInterface_SetRotation
+JPC_BodyInterface_GetRotation :: jolt.JPC_BodyInterface_GetRotation
+JPC_BodyInterface_GetWorldTransform :: jolt.JPC_BodyInterface_GetWorldTransform
+JPC_BodyInterface_GetCenterOfMassTransform :: jolt.JPC_BodyInterface_GetCenterOfMassTransform
+JPC_BodyInterface_MoveKinematic :: jolt.JPC_BodyInterface_MoveKinematic
+JPC_BodyInterface_SetLinearAndAngularVelocity :: jolt.JPC_BodyInterface_SetLinearAndAngularVelocity
+JPC_BodyInterface_GetLinearAndAngularVelocity :: jolt.JPC_BodyInterface_GetLinearAndAngularVelocity
+JPC_BodyInterface_SetLinearVelocity :: jolt.JPC_BodyInterface_SetLinearVelocity
+JPC_BodyInterface_GetLinearVelocity :: jolt.JPC_BodyInterface_GetLinearVelocity
+JPC_BodyInterface_AddLinearVelocity :: jolt.JPC_BodyInterface_AddLinearVelocity
+JPC_BodyInterface_AddLinearAndAngularVelocity :: jolt.JPC_BodyInterface_AddLinearAndAngularVelocity
+JPC_BodyInterface_SetAngularVelocity :: jolt.JPC_BodyInterface_SetAngularVelocity
+JPC_BodyInterface_GetAngularVelocity :: jolt.JPC_BodyInterface_GetAngularVelocity
+JPC_BodyInterface_GetPointVelocity :: jolt.JPC_BodyInterface_GetPointVelocity
+JPC_BodyInterface_SetPositionRotationAndVelocity ::
+	jolt.JPC_BodyInterface_SetPositionRotationAndVelocity
+JPC_BodyInterface_AddForce :: jolt.JPC_BodyInterface_AddForce
+JPC_BodyInterface_AddForceAtPoint :: jolt.JPC_BodyInterface_AddForceAtPoint
+JPC_BodyInterface_AddTorque :: jolt.JPC_BodyInterface_AddTorque
+JPC_BodyInterface_AddForceAndTorque :: jolt.JPC_BodyInterface_AddForceAndTorque
+JPC_BodyInterface_AddImpulse :: jolt.JPC_BodyInterface_AddImpulse
+JPC_BodyInterface_AddImpulse3 :: jolt.JPC_BodyInterface_AddImpulse3
+JPC_BodyInterface_AddAngularImpulse :: jolt.JPC_BodyInterface_AddAngularImpulse
+JPC_BodyInterface_GetBodyType :: jolt.JPC_BodyInterface_GetBodyType
+JPC_BodyInterface_SetMotionType :: jolt.JPC_BodyInterface_SetMotionType
+JPC_BodyInterface_GetMotionType :: jolt.JPC_BodyInterface_GetMotionType
+JPC_BodyInterface_SetMotionQuality :: jolt.JPC_BodyInterface_SetMotionQuality
+JPC_BodyInterface_GetMotionQuality :: jolt.JPC_BodyInterface_GetMotionQuality
+JPC_BodyInterface_GetInverseInertia :: jolt.JPC_BodyInterface_GetInverseInertia
+JPC_BodyInterface_SetRestitution :: jolt.JPC_BodyInterface_SetRestitution
+JPC_BodyInterface_GetRestitution :: jolt.JPC_BodyInterface_GetRestitution
+JPC_BodyInterface_SetFriction :: jolt.JPC_BodyInterface_SetFriction
+JPC_BodyInterface_GetFriction :: jolt.JPC_BodyInterface_GetFriction
+JPC_BodyInterface_SetGravityFactor :: jolt.JPC_BodyInterface_SetGravityFactor
+JPC_BodyInterface_GetGravityFactor :: jolt.JPC_BodyInterface_GetGravityFactor
+JPC_BodyInterface_SetUseManifoldReduction :: jolt.JPC_BodyInterface_SetUseManifoldReduction
+JPC_BodyInterface_GetUseManifoldReduction :: jolt.JPC_BodyInterface_GetUseManifoldReduction
+JPC_BodyInterface_GetUserData :: jolt.JPC_BodyInterface_GetUserData
+JPC_BodyInterface_SetUserData :: jolt.JPC_BodyInterface_SetUserData
+JPC_BodyInterface_InvalidateContactCache :: jolt.JPC_BodyInterface_InvalidateContactCache
+
+JPC_NarrowPhaseQuery_CastRay :: jolt.JPC_NarrowPhaseQuery_CastRay
+JPC_ShapeCastSettings_default :: jolt.JPC_ShapeCastSettings_default
+JPC_NarrowPhaseQuery_CastShape :: jolt.JPC_NarrowPhaseQuery_CastShape
+JPC_CollideShapeSettings_default :: jolt.JPC_CollideShapeSettings_default
+JPC_NarrowPhaseQuery_CollideShape :: jolt.JPC_NarrowPhaseQuery_CollideShape
+
+JPC_PhysicsSystem_new :: jolt.JPC_PhysicsSystem_new
+JPC_PhysicsSystem_delete :: jolt.JPC_PhysicsSystem_delete
+JPC_PhysicsSystem_Init :: jolt.JPC_PhysicsSystem_Init
+JPC_PhysicsSystem_OptimizeBroadPhase :: jolt.JPC_PhysicsSystem_OptimizeBroadPhase
+JPC_PhysicsSystem_Update :: jolt.JPC_PhysicsSystem_Update
+JPC_PhysicsSystem_AddConstraint :: jolt.JPC_PhysicsSystem_AddConstraint
+JPC_PhysicsSystem_RemoveConstraint :: jolt.JPC_PhysicsSystem_RemoveConstraint
+JPC_PhysicsSystem_GetBodyInterface :: jolt.JPC_PhysicsSystem_GetBodyInterface
+JPC_PhysicsSystem_GetBodyLockInterface :: jolt.JPC_PhysicsSystem_GetBodyLockInterface
+JPC_PhysicsSystem_GetNarrowPhaseQuery :: jolt.JPC_PhysicsSystem_GetNarrowPhaseQuery
+JPC_PhysicsSystem_SetSimShapeFilter :: jolt.JPC_PhysicsSystem_SetSimShapeFilter
+JPC_PhysicsSystem_SetContactListener :: jolt.JPC_PhysicsSystem_SetContactListener

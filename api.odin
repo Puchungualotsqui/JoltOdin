@@ -1,4 +1,4 @@
-package joltc
+package jolt
 
 import "./jolt"
 
